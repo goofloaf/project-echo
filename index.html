@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROJECT ECHO: Hacker World</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap');
+body {
+  margin: 0;
+  background: #010103;
+  font-family: 'Share Tech Mono', monospace;
+  color: #00ffcc;
+  overflow-x: hidden;
+}
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  background: rgba(0,0,0,0.7);
+  padding: 12px 0;
+  backdrop-filter: blur(5px);
+  z-index: 999;
+}
+header button {
+  background: transparent;
+  border: 1px solid #00ffcc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: #00ffcc;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+header button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 12px #00ffcc80;
+}
+.section {
+  min-height: 100vh;
+  padding: 120px 40px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(80px);
+  transition: 1s ease;
+}
+.section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hero-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 4.5rem;
+  text-align: center;
+  text-shadow: 0 0 25px #00ffcc;
+}
+.hero-sub {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+.terminal {
+  background: #000;
+  border: 2px solid #00ffcc;
+  padding: 18px;
+  min-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 0 20px #00ffcc50;
+  font-family: 'Share Tech Mono', monospace;
+}
+.terminal-input {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border: none;
+  border-bottom: 2px solid #00ffcc;
+  background: black;
+  color: #00ffcc;
+  font-size: 1.2rem;
+  outline: none;
+}
+.mute-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid #00ffcc;
+  color: #00ffcc;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+footer {
+  text-align: center;
+  color: rgba(0,255,204,0.2);
+  padding: 24px;
+  font-size: 13px;
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<audio id="bgmusic" loop autoplay>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+<button class="mute-btn" id="muteBtn">Mute</button>
+<header>
+  <button data-target="hero">Home</button>
+  <button data-target="terminal-section">Terminal</button>
+  <button data-target="missions">Missions</button>
+  <button data-target="footer">Footer</button>
+</header>
+<section class="section visible" id="hero">
+  <div class="hero-title">PROJECT ECHO</div>
+  <div class="hero-sub">Enter the Hacker World</div>
+</section>
+<section class="section" id="terminal-section">
+  <h2>Hacker Terminal</h2>
+  <div class="terminal" id="terminalBox"></div>
+  <input type="text" class="terminal-input" id="terminalInput" placeholder="Enter command (type 'help')">
+</section>
+
+<section class="section" id="missions">
+  <h2>Missions & Challenges</h2>
+  <p>Discover hidden commands, solve puzzles, and unlock hacker achievements.</p>
+</section>
+<footer id="footer">© 2025 PROJECT ECHO — Hacker World Experience</footer>
+<script>
+// Smooth reveal on scroll
+const sections = document.querySelectorAll(".section");
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add("visible");
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => obs.observe(s));
+
+// Header navigation buttons
+document.querySelectorAll('header button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.getAttribute('data-target');
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+});
+
+// Terminal functionality
+const term = document.getElementById("terminalBox");
+const input = document.getElementById("terminalInput");
+
+function respond(cmd){
+  let out = "";
+  cmd = cmd.toLowerCase();
+  if(cmd === "help") out = "Commands: help, ping, echo, hack, decrypt, launch, mission1";
+  else if(cmd === "ping") out = "System alive. Response time: 4ms";
+  else if(cmd === "echo") out = "ECHO: 'The hacker dimension welcomes you.'";
+  else if(cmd === "hack") out = "Mini-game: Guess the password [3 attempts]. Type '1234', 'abcd' or 'echo'.";
+  else if(cmd === "decrypt") out = "Decrypt puzzle unlocked: Solve the riddle hidden in the page.";
+  else if(cmd === "launch") { 
+    out = "Launching particle explosion..."; 
+    particleEffect(3); 
+    playBeep(); 
+  }
+  else if(cmd === "mission1") { 
+    out = "Mission 1 unlocked: Secret hacker lab revealed!"; 
+    showSecretLab(); 
+  }
+  else if(cmd === "1234" || cmd === "abcd" || cmd === "echo") out = "Password correct! Terminal access granted.";
+  else out = "Unknown command.";
+  term.innerHTML += "<div>&gt; "+cmd+"</div><div>"+out+"</div>";
+  term.scrollTop = term.scrollHeight;
+}
+
+input.addEventListener("keydown", e => {
+  if(e.key === "Enter" && input.value.trim() !== ""){
+    respond(input.value.trim());
+    input.value = "";
+  }
+});
+// Background particles
+const c = document.getElementById("particles");
+const x = c.getContext("2d");
+
+function resizeCanvas(){ 
+  c.width = document.body.scrollWidth; 
+  c.height = document.body.scrollHeight; 
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("scroll", resizeCanvas);
+
+// Create particles
+let pts = [];
+for(let i = 0; i < 150; i++){ 
+  pts.push({
+    x: Math.random()*window.innerWidth,
+    y: Math.random()*document.body.scrollHeight,
+    vx: (Math.random()-0.5)*0.7,
+    vy: (Math.random()-0.5)*0.7,
+    s: Math.random()*2+1
+  });
+}
+
+function draw(){
+  x.clearRect(0,0,c.width,c.height);
+  pts.forEach(p=>{
+    x.fillStyle="#00ffcc";
+    x.beginPath();
+    x.arc(p.x,p.y,p.s,0,Math.PI*2);
+    x.fill();
+    p.x += p.vx; 
+    p.y += p.vy;
+    if(p.x < 0 || p.x > c.width) p.vx*=-1;
+    if(p.y < 0 || p.y > c.height) p.vy*=-1;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+// Particle effect triggered by terminal command
+function particleEffect(count){
+  for(let i=0;i<count*50;i++){ 
+    pts.push({
+      x: Math.random()*window.innerWidth,
+      y: Math.random()*document.body.scrollHeight,
+      vx: (Math.random()-0.5)*2,
+      vy: (Math.random()-0.5)*2,
+      s: Math.random()*3+1
+    }); 
+  }
+}
+
+// Secret hacker lab section
+function showSecretLab(){
+  let lab = document.createElement("div");
+  lab.innerHTML = "<h3>Secret Hacker Lab Unlocked!</h3><p>Explore hidden commands and mini-games.</p>";
+  lab.style.background = "rgba(0,255,204,0.05)";
+  lab.style.padding = "20px";
+  lab.style.marginTop = "20px";
+  lab.style.border = "1px solid #00ffcc";
+  lab.style.borderRadius = "8px";
+  document.getElementById("missions").appendChild(lab);
+}
+
+// Play beep sound
+function playBeep(){ 
+  let beep = new Audio("https://freesound.org/data/previews/170/170148_2437358-lq.mp3"); 
+  beep.play(); 
+}
+
+// Mute button
+const bgmusic = document.getElementById("bgmusic");
+const muteBtn = document.getElementById("muteBtn");
+muteBtn.addEventListener("click", ()=>{
+  bgmusic.muted = !bgmusic.muted; 
+  muteBtn.innerText = bgmusic.muted ? "Unmute" : "Mute";
+});
+</script>
+</body>
+</html>
